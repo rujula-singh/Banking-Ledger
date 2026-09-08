@@ -7,11 +7,21 @@ A full-stack personal banking and double-entry ledger platform — Node.js/Expre
 ## Screenshots / Demo
 
 
-| Dashboard | Transactions |
-|![Dashboard](images/dashboard.png)| ![Transactions](images/transaction-demo.png) |
+# Dashboard
 
-| Insights & Budgets | Statements |
-![Transactions](images/transaction-demo.png) |![Statemnets](images/statements.png) |
+![Dashboard](images/dashboard.png)
+
+# Transactions
+
+![Transactions](images/transaction-demo.png) 
+
+# Insights & Budgets  
+
+![Transactions](images/transaction-demo.png)
+
+# Statements
+
+![Statemnets](images/statements.png) 
 
 ---
 
