@@ -1,2 +1,12 @@
-/.env
-/node_modules
+node_modules
+.env
+.env.local
+.env.*.local
+dist
+.DS_Store
+Thumbs.db
+Backend/node_modules
+Backend/.env
+Banking.md 
+Banking.pdf
+readme.md

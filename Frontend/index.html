@@ -1,0 +1,906 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Nexus Ledger | Personal Banking & Transaction Platform</title>
+  <meta name="description" content="Next-generation personal banking, double-entry ledger management, smart budgeting, and spending insights.">
+  
+  <!-- Google Fonts: Outfit & Inter -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  
+  <link rel="stylesheet" href="./css/style.css">
+</head>
+<body class="dark-theme">
+  <!-- Toast Container -->
+  <div id="toast-container" class="toast-container"></div>
+
+  <!-- App Header / Navbar -->
+  <header class="app-header" id="main-header">
+    <div class="header-left">
+      <div class="brand-logo">
+        <div class="logo-mark">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M12 2L2 7L12 12L22 7L12 2Z" stroke="url(#logo-grad)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M2 17L12 22L22 17" stroke="url(#logo-grad)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M2 12L12 17L22 12" stroke="url(#logo-grad)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+            <defs>
+              <linearGradient id="logo-grad" x1="2" y1="2" x2="22" y2="22" gradientUnits="userSpaceOnUse">
+                <stop stop-color="#6366F1"/>
+                <stop offset="1" stop-color="#06B6D4"/>
+              </linearGradient>
+            </defs>
+          </svg>
+        </div>
+        <span class="brand-name">NEXUS<span>LEDGER</span></span>
+      </div>
+
+      <nav class="main-nav" id="main-nav">
+        <button class="nav-link active" data-view="dashboard" id="nav-dashboard">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+          Dashboard
+        </button>
+        <button class="nav-link" data-view="transactions" id="nav-transactions">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+          Transactions
+        </button>
+        <button class="nav-link" data-view="insights" id="nav-insights">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21.21 15.89A10 10 0 1 1 8 2.83"/><path d="M22 12A10 10 0 0 0 12 2v10z"/></svg>
+          Insights & Budgets
+        </button>
+        <button class="nav-link" data-view="statements" id="nav-statements">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
+          Statements
+        </button>
+        <button class="nav-link" data-view="security" id="nav-security">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+          Trust & Security
+        </button>
+      </nav>
+    </div>
+
+    <div class="header-right">
+      <!-- Sync indicator -->
+      <div class="ledger-status-pill" title="Double-Entry Ledger Verified">
+        <span class="status-dot pulse"></span>
+        <span class="status-text">Ledger Active</span>
+      </div>
+
+      <!-- Notifications Bell -->
+      <div class="notifications-wrapper">
+        <button class="icon-btn" id="notif-btn" title="Notifications" aria-label="Notifications">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+          <span class="notif-badge hidden" id="notif-count">0</span>
+        </button>
+        
+        <!-- Notification Dropdown -->
+        <div class="dropdown-panel notif-panel hidden" id="notif-dropdown">
+          <div class="dropdown-header">
+            <h4>Notifications</h4>
+            <button class="text-btn" id="notif-mark-all">Mark all read</button>
+          </div>
+          <div class="notif-list" id="notif-list">
+            <p class="empty-state">No notifications yet.</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- User Profile Menu -->
+      <div class="user-menu-wrapper" id="user-menu-container">
+        <div class="user-profile-badge" id="user-profile-btn">
+          <div class="avatar" id="user-avatar">RS</div>
+          <div class="user-details">
+            <span class="user-name" id="header-user-name">User</span>
+            <span class="user-role">Verified Customer</span>
+          </div>
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m6 9 6 6 6-6"/></svg>
+        </div>
+
+        <div class="dropdown-panel user-dropdown hidden" id="user-dropdown">
+          <div class="user-dropdown-header">
+            <p class="dropdown-email" id="dropdown-user-email">user@example.com</p>
+          </div>
+          <div class="dropdown-divider"></div>
+          <button class="dropdown-item" id="btn-switch-account">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+            Switch Account
+          </button>
+          <button class="dropdown-item danger" id="btn-logout">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+            Sign Out
+          </button>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Content Wrapper -->
+  <main class="app-main">
+
+    <!-- Auth View (Shown when not authenticated) -->
+    <section class="auth-section hidden" id="view-auth">
+      <div class="auth-card">
+        <div class="auth-header">
+          <div class="brand-logo center">
+            <div class="logo-mark lg">
+              <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="url(#auth-grad)" stroke-width="2.5"><path d="M12 2L2 7L12 12L22 7L12 2Z"/><path d="M2 17L12 22L22 17"/><path d="M2 12L12 17L22 12"/><defs><linearGradient id="auth-grad" x1="2" y1="2" x2="22" y2="22"><stop stop-color="#6366F1"/><stop offset="1" stop-color="#06B6D4"/></linearGradient></defs></svg>
+            </div>
+          </div>
+          <h1 class="auth-title">Welcome to Nexus Ledger</h1>
+          <p class="auth-subtitle">Personal Banking & Transaction Management Platform</p>
+        </div>
+
+        <div class="auth-tabs">
+          <button class="auth-tab active" id="tab-login">Sign In</button>
+          <button class="auth-tab" id="tab-register">Create Account</button>
+        </div>
+
+        <!-- Login Form -->
+        <form class="auth-form" id="form-login">
+          <div class="form-group">
+            <label for="login-email">Email Address</label>
+            <input type="email" id="login-email" placeholder="name@example.com" required autocomplete="email">
+          </div>
+          <div class="form-group">
+            <label for="login-password">Password</label>
+            <input type="password" id="login-password" placeholder="••••••••" required autocomplete="current-password">
+          </div>
+          <button type="submit" class="btn btn-primary full-width" id="btn-submit-login">Sign In</button>
+        </form>
+
+        <!-- Register Form -->
+        <form class="auth-form hidden" id="form-register">
+          <div class="form-group">
+            <label for="reg-name">Full Name</label>
+            <input type="text" id="reg-name" placeholder="Rujula Singh" required autocomplete="name">
+          </div>
+          <div class="form-group">
+            <label for="reg-email">Email Address</label>
+            <input type="email" id="reg-email" placeholder="rujula@example.com" required autocomplete="email">
+          </div>
+          <div class="form-group">
+            <label for="reg-password">Password (min 6 characters)</label>
+            <input type="password" id="reg-password" placeholder="••••••••" minlength="6" required autocomplete="new-password">
+          </div>
+          <button type="submit" class="btn btn-primary full-width" id="btn-submit-register">Create Account & Provision Ledger</button>
+        </form>
+      </div>
+    </section>
+
+    <!-- DASHBOARD VIEW -->
+    <section class="view-content" id="view-dashboard">
+      <!-- Welcome & Quick Metrics -->
+      <div class="dashboard-hero">
+        <div class="hero-welcome">
+          <span class="greeting-time" id="greeting-time">Good morning,</span>
+          <h2 class="user-greeting" id="dashboard-user-greeting">Rujula Singh</h2>
+          <p class="greeting-subtitle" id="current-date-display">Wednesday, 02 September 2026</p>
+        </div>
+
+        <div class="hero-actions">
+          <button class="btn btn-accent" id="btn-hero-send">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+            Send Money
+          </button>
+          <button class="btn btn-outline" id="btn-hero-deposit">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+            Add Funds
+          </button>
+        </div>
+      </div>
+
+      <!-- Financial Snapshot Grid -->
+      <div class="dashboard-grid">
+        <!-- Total Combined Balance Card -->
+        <div class="metric-card net-worth-card">
+          <div class="card-meta">
+            <span class="card-label">Total Net Worth</span>
+            <span class="badge badge-success">Ledger Verified</span>
+          </div>
+          <div class="card-value-display">
+            <span class="currency-symbol">₹</span>
+            <span class="large-balance" id="total-net-balance">0.00</span>
+          </div>
+          <div class="cashflow-summary-row" id="hero-cashflow-row">
+            <div class="cf-item income">
+              <span class="cf-icon">↑</span>
+              <span class="cf-label">Money In</span>
+              <span class="cf-amount" id="dash-cashflow-in">+₹0.00</span>
+            </div>
+            <div class="cf-divider"></div>
+            <div class="cf-item expense">
+              <span class="cf-icon">↓</span>
+              <span class="cf-label">Money Out</span>
+              <span class="cf-amount" id="dash-cashflow-out">-₹0.00</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Quick Action Bar -->
+        <div class="quick-actions-card">
+          <h4 class="card-title">Quick Services</h4>
+          <div class="action-grid">
+            <button class="action-tile" id="tile-send">
+              <div class="tile-icon indigo">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+              </div>
+              <span>Send Money</span>
+            </button>
+            <button class="action-tile" id="tile-deposit">
+              <div class="tile-icon emerald">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+              </div>
+              <span>Deposit</span>
+            </button>
+            <button class="action-tile" id="tile-statement">
+              <div class="tile-icon cyan">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+              </div>
+              <span>Statement</span>
+            </button>
+            <button class="action-tile" id="tile-budget">
+              <div class="tile-icon amber">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
+              </div>
+              <span>Set Budget</span>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- My Accounts Section (Section 2 & 12) -->
+      <div class="section-header">
+        <div>
+          <h3 class="section-title">My Accounts</h3>
+          <p class="section-subtitle">Multi-account balances calculated directly from immutable ledger audit trails</p>
+        </div>
+        <button class="btn btn-secondary btn-sm" id="btn-add-account">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+          Open New Account
+        </button>
+      </div>
+
+      <div class="accounts-grid" id="accounts-container">
+        <!-- Account Cards dynamically loaded -->
+      </div>
+
+      <!-- Insights & Budget Alert Bar (Section 7 & 8) -->
+      <div class="alert-banner-container" id="dash-budget-alerts">
+        <!-- Dynamic threshold warnings like: ⚠️ You've used 93% of your shopping budget. -->
+      </div>
+
+      <!-- Recent Transactions (Section 2) -->
+      <div class="section-header mt-lg">
+        <div>
+          <h3 class="section-title">Recent Transactions</h3>
+          <p class="section-subtitle">Latest account movements</p>
+        </div>
+        <button class="btn btn-text" id="btn-view-all-txns">View All Activity →</button>
+      </div>
+
+      <div class="card transaction-list-card">
+        <div class="transactions-feed" id="dashboard-txns-list">
+          <!-- Dynamically populated -->
+        </div>
+      </div>
+    </section>
+
+    <!-- TRANSACTIONS VIEW (Section 5) -->
+    <section class="view-content hidden" id="view-transactions">
+      <div class="section-header">
+        <div>
+          <h2 class="section-title">Transaction Ledger History</h2>
+          <p class="section-subtitle">Comprehensive immutable audit trail of all debits and credits</p>
+        </div>
+        <div class="header-action-group">
+          <button class="btn btn-accent" id="btn-txns-send">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+            Send Money
+          </button>
+          <button class="btn btn-outline" id="btn-txns-deposit">
+            Add Funds
+          </button>
+        </div>
+      </div>
+
+      <!-- Search & Filters Toolbar -->
+      <div class="card filter-toolbar">
+        <div class="search-input-wrapper">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+          <input type="text" id="tx-search-input" placeholder="Search transactions, order IDs, recipients...">
+        </div>
+
+        <div class="filter-controls">
+          <!-- Type Filter Tabs -->
+          <div class="pill-tabs" id="tx-type-tabs">
+            <button class="pill-tab active" data-type="ALL">All</button>
+            <button class="pill-tab" data-type="INCOME">Income</button>
+            <button class="pill-tab" data-type="EXPENSE">Expense</button>
+            <button class="pill-tab" data-type="TRANSFERS">Transfers</button>
+          </div>
+
+          <!-- Category Dropdown -->
+          <select id="tx-category-select" class="form-select">
+            <option value="All">All Categories</option>
+            <option value="Food">Food</option>
+            <option value="Shopping">Shopping</option>
+            <option value="Bills">Bills</option>
+            <option value="Transport">Transport</option>
+            <option value="Entertainment">Entertainment</option>
+            <option value="Salary">Salary</option>
+            <option value="Transfer">Transfer</option>
+            <option value="Other">Other</option>
+          </select>
+
+          <!-- Account Dropdown Filter -->
+          <select id="tx-account-select" class="form-select">
+            <option value="">All Accounts</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- Transactions Table -->
+      <div class="card table-card">
+        <div class="table-responsive">
+          <table class="data-table" id="transactions-table">
+            <thead>
+              <tr>
+                <th>Date & Time</th>
+                <th>Description</th>
+                <th>Category</th>
+                <th>Account</th>
+                <th>Status</th>
+                <th class="text-right">Amount</th>
+                <th></th>
+              </tr>
+            </thead>
+            <tbody id="tx-table-body">
+              <!-- Dynamically loaded -->
+            </tbody>
+          </table>
+        </div>
+        <div class="pagination-bar" id="tx-pagination">
+          <span class="pagination-info" id="pagination-info">Showing 0 of 0 transactions</span>
+          <div class="pagination-buttons">
+            <button class="btn btn-secondary btn-sm" id="btn-prev-page" disabled>Previous</button>
+            <button class="btn btn-secondary btn-sm" id="btn-next-page" disabled>Next</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- INSIGHTS & BUDGETS VIEW (Sections 7 & 8) -->
+    <section class="view-content hidden" id="view-insights">
+      <div class="section-header">
+        <div>
+          <h2 class="section-title">Spending Insights & Budgets</h2>
+          <p class="section-subtitle">Real-time spend aggregation and proactive budget tracking</p>
+        </div>
+        <button class="btn btn-accent" id="btn-open-budget-modal">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+          Set New Budget
+        </button>
+      </div>
+
+      <!-- Monthly Trend Highlights (Section 7) -->
+      <div class="insights-highlights-grid" id="insights-highlights">
+        <!-- Highlights like: "You spent 18% more on shopping than last month." -->
+      </div>
+
+      <!-- Analytics Layout -->
+      <div class="insights-layout">
+        <!-- Spending by Category Card -->
+        <div class="card insights-card">
+          <div class="card-header-row">
+            <div>
+              <h3 class="card-title">Category Spending</h3>
+              <p class="card-subtitle" id="insights-month-label">September 2026 Breakdown</p>
+            </div>
+            <span class="badge badge-indigo" id="insights-total-spend">Total: ₹0</span>
+          </div>
+
+          <div class="category-breakdown-list" id="category-breakdown-container">
+            <!-- Dynamically populated category bars -->
+          </div>
+        </div>
+
+        <!-- Budget Tracker Card (Section 8) -->
+        <div class="card insights-card">
+          <div class="card-header-row">
+            <div>
+              <h3 class="card-title">Monthly Budgets</h3>
+              <p class="card-subtitle">Limits, current utilization & warnings</p>
+            </div>
+            <span class="badge badge-neutral" id="budgets-count-badge">0 Budgets</span>
+          </div>
+
+          <div class="budgets-list" id="budgets-container">
+            <!-- Dynamic budget progress bars -->
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- STATEMENTS VIEW (Section 6) -->
+    <section class="view-content hidden" id="view-statements">
+      <div class="section-header">
+        <div>
+          <h2 class="section-title">Account Statements</h2>
+          <p class="section-subtitle">Generate and download official monthly statements</p>
+        </div>
+        <button class="btn btn-primary" id="btn-download-statement-csv">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+          Download CSV Statement
+        </button>
+      </div>
+
+      <!-- Statement Selector Card -->
+      <div class="card statement-selector-card">
+        <div class="statement-controls-row">
+          <div class="form-group">
+            <label for="stmt-account-select">Select Account</label>
+            <select id="stmt-account-select" class="form-select">
+              <!-- Dynamically filled with user accounts -->
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="stmt-month-select">Statement Month</label>
+            <select id="stmt-month-select" class="form-select">
+              <option value="1">January</option>
+              <option value="2">February</option>
+              <option value="3">March</option>
+              <option value="4">April</option>
+              <option value="5">May</option>
+              <option value="6">June</option>
+              <option value="7">July</option>
+              <option value="8">August</option>
+              <option value="9" selected>September</option>
+              <option value="10">October</option>
+              <option value="11">November</option>
+              <option value="12">December</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="stmt-year-select">Statement Year</label>
+            <select id="stmt-year-select" class="form-select">
+              <option value="2026" selected>2026</option>
+              <option value="2025">2025</option>
+            </select>
+          </div>
+          <div class="form-group align-end">
+            <button class="btn btn-secondary" id="btn-fetch-statement">Generate View</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Statement Summary Sheet (Section 6) -->
+      <div class="card statement-sheet-card" id="statement-sheet">
+        <div class="statement-sheet-header">
+          <div class="bank-identity">
+            <span class="statement-bank-name">NEXUS LEDGER BANK</span>
+            <span class="statement-title-tag">OFFICIAL ACCOUNT STATEMENT</span>
+          </div>
+          <div class="statement-period-badge" id="stmt-header-period">September 2026</div>
+        </div>
+
+        <!-- 4-Pillar Financial Summary -->
+        <div class="statement-metrics-grid">
+          <div class="stmt-metric-box">
+            <span class="stmt-metric-label">Opening Balance</span>
+            <span class="stmt-metric-val" id="stmt-open-bal">₹0.00</span>
+          </div>
+          <div class="stmt-metric-box positive">
+            <span class="stmt-metric-label">Total Money In</span>
+            <span class="stmt-metric-val" id="stmt-in-val">+₹0.00</span>
+          </div>
+          <div class="stmt-metric-box negative">
+            <span class="stmt-metric-label">Total Money Out</span>
+            <span class="stmt-metric-val" id="stmt-out-val">-₹0.00</span>
+          </div>
+          <div class="stmt-metric-box highlight">
+            <span class="stmt-metric-label">Closing Balance</span>
+            <span class="stmt-metric-val" id="stmt-close-bal">₹0.00</span>
+          </div>
+        </div>
+
+        <!-- Statement Line Items -->
+        <div class="statement-items-wrapper">
+          <h4 class="items-title">Itemized Transactions</h4>
+          <table class="statement-table">
+            <thead>
+              <tr>
+                <th>Date</th>
+                <th>Transaction ID</th>
+                <th>Description</th>
+                <th>Category</th>
+                <th>Type</th>
+                <th class="text-right">Amount</th>
+                <th class="text-right">Balance</th>
+              </tr>
+            </thead>
+            <tbody id="stmt-table-body">
+              <tr><td colspan="7" class="text-center py-lg">Select account & period to view statement</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- TRUST & SECURITY VIEW (Section 11) -->
+    <section class="view-content hidden" id="view-security">
+      <div class="section-header">
+        <div>
+          <h2 class="section-title">Security & Device Sessions</h2>
+          <p class="section-subtitle">Account protection, active devices, and session authorization</p>
+        </div>
+        <button class="btn btn-danger" id="btn-revoke-sessions">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18.36 6.64a9 9 0 1 1-12.73 0"/><line x1="12" y1="2" x2="12" y2="12"/></svg>
+          Logout All Other Sessions
+        </button>
+      </div>
+
+      <div class="security-grid">
+        <!-- Active Sessions Card -->
+        <div class="card security-card">
+          <div class="card-header-row">
+            <h3 class="card-title">Active Devices & Sessions</h3>
+            <span class="badge badge-success">Encrypted JWT</span>
+          </div>
+          <div class="sessions-list" id="security-sessions-list">
+            <!-- Dynamic session items -->
+          </div>
+        </div>
+
+        <!-- Security Activity Log (Section 11) -->
+        <div class="card security-card">
+          <div class="card-header-row">
+            <h3 class="card-title">Security Activity Log</h3>
+            <span class="badge badge-neutral">Audit Log</span>
+          </div>
+          <div class="activity-timeline" id="security-activity-list">
+            <div class="timeline-item">
+              <div class="timeline-dot success"></div>
+              <div class="timeline-content">
+                <p class="activity-title">Session Login from Chrome</p>
+                <p class="activity-sub">Delhi, India • Windows 11</p>
+                <span class="activity-time">Today, Just now</span>
+              </div>
+            </div>
+            <div class="timeline-item">
+              <div class="timeline-dot info"></div>
+              <div class="timeline-content">
+                <p class="activity-title">Ledger Transaction Session Initialized</p>
+                <p class="activity-sub">Idempotency verification active</p>
+                <span class="activity-time">Today</span>
+              </div>
+            </div>
+            <div class="timeline-item">
+              <div class="timeline-dot neutral"></div>
+              <div class="timeline-content">
+                <p class="activity-title">Double-Entry Ledger Integrity Verified</p>
+                <p class="activity-sub">Strict debit/credit parity confirmed</p>
+                <span class="activity-time">Yesterday</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- ================= MODALS ================= -->
+
+  <!-- 1. SEND MONEY MODAL (3-Step Trust Experience: Sections 3 & 10) -->
+  <div class="modal-backdrop hidden" id="modal-transfer">
+    <div class="modal-dialog">
+      <!-- Step 1: Input -->
+      <div class="modal-step" id="transfer-step-1">
+        <div class="modal-header">
+          <div class="step-indicator">Step 1 of 2</div>
+          <h3 class="modal-title">Send Money</h3>
+          <button class="modal-close" data-modal="modal-transfer">✕</button>
+        </div>
+
+        <form id="form-transfer-step1">
+          <!-- Source Account -->
+          <div class="form-group">
+            <label for="tf-from-account">From Account</label>
+            <select id="tf-from-account" class="form-select" required>
+              <!-- Filled with user accounts -->
+            </select>
+            <span class="form-hint" id="tf-from-balance-hint">Available: ₹0.00</span>
+          </div>
+
+          <!-- Recipient Destination Mode -->
+          <div class="form-group">
+            <label>Transfer Destination</label>
+            <div class="pill-tabs mb-sm" id="tf-dest-mode">
+              <button type="button" class="pill-tab active" data-mode="email">User Email</button>
+              <button type="button" class="pill-tab" data-mode="account">Account No.</button>
+              <button type="button" class="pill-tab" data-mode="self">My Other Account</button>
+            </div>
+
+            <div id="dest-input-email-group">
+              <input type="email" id="tf-recipient-email" placeholder="e.g. rahul@example.com" class="form-input">
+            </div>
+            <div id="dest-input-account-group" class="hidden">
+              <input type="text" id="tf-recipient-account" placeholder="e.g. 482189382194" class="form-input">
+            </div>
+            <div id="dest-input-self-group" class="hidden">
+              <select id="tf-recipient-self" class="form-select">
+                <!-- User's other accounts -->
+              </select>
+            </div>
+          </div>
+
+          <!-- Amount -->
+          <div class="form-group">
+            <label for="tf-amount">Amount (INR)</label>
+            <div class="amount-input-wrapper">
+              <span class="amount-currency-prefix">₹</span>
+              <input type="number" id="tf-amount" min="1" step="any" placeholder="5,000" required class="form-input lg">
+            </div>
+            <!-- Quick shortcut pills -->
+            <div class="quick-amount-pills">
+              <button type="button" class="quick-amt" data-val="500">+₹500</button>
+              <button type="button" class="quick-amt" data-val="1000">+₹1,000</button>
+              <button type="button" class="quick-amt" data-val="5000">+₹5,000</button>
+              <button type="button" class="quick-amt" data-val="10000">+₹10,000</button>
+            </div>
+          </div>
+
+          <!-- Category -->
+          <div class="form-group">
+            <label for="tf-category">Category</label>
+            <select id="tf-category" class="form-select">
+              <option value="Shopping" selected>Shopping</option>
+              <option value="Food">Food</option>
+              <option value="Bills">Bills</option>
+              <option value="Transport">Transport</option>
+              <option value="Entertainment">Entertainment</option>
+              <option value="Salary">Salary</option>
+              <option value="Transfer">Transfer</option>
+              <option value="Other">Other</option>
+            </select>
+          </div>
+
+          <!-- Description -->
+          <div class="form-group">
+            <label for="tf-description">Description / Note</label>
+            <input type="text" id="tf-description" placeholder="e.g. Amazon Order #39281" class="form-input">
+          </div>
+
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-modal="modal-transfer">Cancel</button>
+            <button type="submit" class="btn btn-accent" id="btn-goto-review">Review Transfer →</button>
+          </div>
+        </form>
+      </div>
+
+      <!-- Step 2: Review & Confirmation Screen (Section 3: The Trust Screen) -->
+      <div class="modal-step hidden" id="transfer-step-2">
+        <div class="modal-header">
+          <div class="step-indicator">Step 2 of 2: Review</div>
+          <h3 class="modal-title">Confirm Transfer</h3>
+        </div>
+
+        <div class="transfer-review-card">
+          <p class="review-prompt">You are sending</p>
+          <div class="review-amount" id="review-display-amount">₹5,000.00</div>
+
+          <div class="review-details-grid">
+            <div class="review-item">
+              <span class="rev-label">To Recipient</span>
+              <span class="rev-val" id="review-display-to">Rahul Sharma (rahul@example.com)</span>
+            </div>
+            <div class="review-item">
+              <span class="rev-label">From Account</span>
+              <span class="rev-val" id="review-display-from">Savings Account •••• 4821</span>
+            </div>
+            <div class="review-item">
+              <span class="rev-label">Category</span>
+              <span class="rev-val" id="review-display-category">Shopping</span>
+            </div>
+            <div class="review-item">
+              <span class="rev-label">Description</span>
+              <span class="rev-val" id="review-display-desc">Amazon Order #39281</span>
+            </div>
+            <div class="review-item">
+              <span class="rev-label">Transfer Fee</span>
+              <span class="rev-val free">₹0.00 (Free)</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" id="btn-back-step1">← Edit</button>
+          <button type="button" class="btn btn-primary" id="btn-confirm-transfer">
+            Confirm & Send Money
+          </button>
+        </div>
+      </div>
+
+      <!-- Step 3: Lifecycle / Result State (Section 4 & 10) -->
+      <div class="modal-step hidden" id="transfer-step-result">
+        <!-- Processing animation -->
+        <div class="result-state-wrapper" id="result-state-processing">
+          <div class="spinner-ring"></div>
+          <h3 class="result-title">Processing Transfer...</h3>
+          <p class="result-desc">Writing double-entry ledger entries and verifying atomicity...</p>
+        </div>
+
+        <!-- Success receipt -->
+        <div class="result-state-wrapper hidden" id="result-state-success">
+          <div class="result-icon success">✓</div>
+          <h3 class="result-title">Transfer Successful</h3>
+          <p class="result-desc" id="success-result-msg">₹5,000 sent to Rahul Sharma successfully.</p>
+          
+          <div class="receipt-box">
+            <div class="receipt-row">
+              <span>Transaction Reference:</span>
+              <strong id="success-txn-ref">TXN-83921</strong>
+            </div>
+            <div class="receipt-row">
+              <span>Status:</span>
+              <span class="badge badge-success">COMPLETED</span>
+            </div>
+          </div>
+
+          <button class="btn btn-primary full-width mt-md" data-modal="modal-transfer">Done</button>
+        </div>
+
+        <!-- Friendly Reassuring Failure (Section 10) -->
+        <div class="result-state-wrapper hidden" id="result-state-failure">
+          <div class="result-icon danger">✕</div>
+          <h3 class="result-title">Transfer Unsuccessful</h3>
+          <p class="result-desc" id="failure-result-msg">
+            We couldn't complete your transfer. <strong>Your account balance has not been affected.</strong>
+          </p>
+          
+          <div class="receipt-box">
+            <div class="receipt-row">
+              <span>Transaction ID:</span>
+              <strong id="failure-txn-ref">TXN-12345</strong>
+            </div>
+          </div>
+
+          <div class="modal-footer full-width mt-md">
+            <button class="btn btn-secondary" data-modal="modal-transfer">Close</button>
+            <button class="btn btn-accent" id="btn-retry-transfer">Try Again</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 2. ADD FUNDS / DEPOSIT MODAL -->
+  <div class="modal-backdrop hidden" id="modal-deposit">
+    <div class="modal-dialog sm">
+      <div class="modal-header">
+        <h3 class="modal-title">Add Funds / Deposit</h3>
+        <button class="modal-close" data-modal="modal-deposit">✕</button>
+      </div>
+
+      <form id="form-deposit">
+        <div class="form-group">
+          <label for="dep-account-select">Select Target Account</label>
+          <select id="dep-account-select" class="form-select" required></select>
+        </div>
+
+        <div class="form-group">
+          <label for="dep-amount">Amount to Deposit (INR)</label>
+          <div class="amount-input-wrapper">
+            <span class="amount-currency-prefix">₹</span>
+            <input type="number" id="dep-amount" min="10" placeholder="10,000" required class="form-input lg">
+          </div>
+          <div class="quick-amount-pills">
+            <button type="button" class="quick-dep-amt" data-val="5000">+₹5,000</button>
+            <button type="button" class="quick-dep-amt" data-val="25000">+₹25,000</button>
+            <button type="button" class="quick-dep-amt" data-val="50000">+₹50,000</button>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="dep-description">Deposit Description</label>
+          <input type="text" id="dep-description" value="Monthly Salary / Direct Deposit" class="form-input">
+        </div>
+
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-modal="modal-deposit">Cancel</button>
+          <button type="submit" class="btn btn-primary" id="btn-submit-deposit">Add Funds to Account</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- 3. ADD NEW ACCOUNT MODAL (Section 12: Multi-Accounts) -->
+  <div class="modal-backdrop hidden" id="modal-account">
+    <div class="modal-dialog sm">
+      <div class="modal-header">
+        <h3 class="modal-title">Open New Account</h3>
+        <button class="modal-close" data-modal="modal-account">✕</button>
+      </div>
+
+      <form id="form-create-account">
+        <div class="form-group">
+          <label for="new-acc-type">Account Type</label>
+          <select id="new-acc-type" class="form-select">
+            <option value="CHECKING">Checking Account (Daily spending)</option>
+            <option value="SAVINGS">Savings Account (Interest bearing)</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label for="new-acc-name">Account Nickname</label>
+          <input type="text" id="new-acc-name" placeholder="e.g. Everyday Checking" class="form-input">
+        </div>
+
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-modal="modal-account">Cancel</button>
+          <button type="submit" class="btn btn-primary" id="btn-submit-create-acc">Create Account</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- 4. BUDGET MODAL (Section 8) -->
+  <div class="modal-backdrop hidden" id="modal-budget">
+    <div class="modal-dialog sm">
+      <div class="modal-header">
+        <h3 class="modal-title">Set Category Budget</h3>
+        <button class="modal-close" data-modal="modal-budget">✕</button>
+      </div>
+
+      <form id="form-set-budget">
+        <div class="form-group">
+          <label for="budget-category">Category</label>
+          <select id="budget-category" class="form-select" required>
+            <option value="Shopping">Shopping</option>
+            <option value="Food">Food & Dining</option>
+            <option value="Bills">Bills & Utilities</option>
+            <option value="Transport">Transport</option>
+            <option value="Entertainment">Entertainment</option>
+            <option value="Other">Other</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label for="budget-limit">Monthly Budget Limit (INR)</label>
+          <div class="amount-input-wrapper">
+            <span class="amount-currency-prefix">₹</span>
+            <input type="number" id="budget-limit" min="100" placeholder="8,000" required class="form-input lg">
+          </div>
+        </div>
+
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-modal="modal-budget">Cancel</button>
+          <button type="submit" class="btn btn-primary" id="btn-submit-budget">Save Budget</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- 5. TRANSACTION RECEIPT DETAILS MODAL (Section 5) -->
+  <div class="modal-backdrop hidden" id="modal-txn-detail">
+    <div class="modal-dialog sm">
+      <div class="modal-header">
+        <h3 class="modal-title">Transaction Receipt</h3>
+        <button class="modal-close" data-modal="modal-txn-detail">✕</button>
+      </div>
+
+      <div class="txn-detail-card" id="txn-receipt-content">
+        <!-- Dynamically loaded -->
+      </div>
+
+      <div class="modal-footer">
+        <button class="btn btn-secondary full-width" data-modal="modal-txn-detail">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <script type="module" src="./js/app.js"></script>
+</body>
+</html>
