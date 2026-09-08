@@ -6,20 +6,12 @@ A full-stack personal banking and double-entry ledger platform — Node.js/Expre
 
 ## Screenshots / Demo
 
-<!--
-Add your demo images to docs/images/ and reference them below, e.g.:
-![Dashboard](docs/images/dashboard.png)
-![Transactions](docs/images/transactions.png)
-![Insights & Budgets](docs/images/insights.png)
--->
 
 | Dashboard | Transactions |
-|---|---|
-| _add image_ | _add image_ |
+|![Dashboard](images/dashboard.png)| ![Transactions](images/transaction-demo.png) |
 
 | Insights & Budgets | Statements |
-|---|---|
-| _add image_ | _add image_ |
+![Transactions](images/transaction-demo.png) |![Statemnets](images/statements.png) |
 
 ---
 
@@ -113,18 +105,6 @@ banking-ledger/
 
 Instead of a mutable `balance` column, every account's balance is derived in real time:
 
-```sql
-SELECT COALESCE(SUM(
-  CASE
-    WHEN type = 'CREDIT' THEN amount
-    WHEN type = 'DEBIT' THEN -amount
-    ELSE 0
-  END
-), 0) AS balance
-FROM ledger_entries
-WHERE account_id = $1;
-```
-
 Each transfer:
 - Requires a client-supplied **idempotency key** to prevent duplicate transactions on network retries.
 - Runs inside an isolated **Postgres transaction**, so either everything (ledger entries + transaction record) commits, or nothing does.
@@ -147,48 +127,6 @@ Defined in `Backend/src/db/migrations/001_create_schema.sql`:
 | `notifications` | User notification history and read state |
 | `token_blacklist` | Revoked JWTs |
 
----
-
-## Getting Started
-
-### Prerequisites
-- Node.js
-- PostgreSQL running locally (or a `DATABASE_URL`)
-
-### 1. Install dependencies
-```bash
-cd Backend
-npm install
-```
-
-### 2. Configure environment
-Create `Backend/.env`:
-```env
-DATABASE_URL=postgresql://postgres:postgres@localhost:5432/nexus_ledger
-PGUSER=postgres
-PGHOST=localhost
-PGDATABASE=nexus_ledger
-PGPASSWORD=postgres
-PGPORT=5432
-
-JWT_SECRET=your_secure_jwt_secret
-```
-
-### 3. Run migrations
-```bash
-npm run migrate
-```
-(Migrations also run automatically on server startup.)
-
-### 4. Start the server
-```bash
-npm run dev     # development, with nodemon
-npm start       # production
-```
-
-The Express server also serves the `Frontend/` folder as static files and falls back to `index.html` for client-side routing, so once the backend is running you can open it directly in the browser at the server's port.
-
----
 
 ## API Overview
 
@@ -224,6 +162,3 @@ All routes are prefixed with `/api`. Protected routes require a valid JWT (via c
 
 ---
 
-## License
-
-Add your license of choice here.
